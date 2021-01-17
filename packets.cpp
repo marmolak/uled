@@ -13,35 +13,14 @@
 #include <vector>
 #include <chrono>
 
+#include "RemoteProtocol/RemoteProtocol.hpp"
+
 using namespace std::chrono_literals;
 using namespace std;
 
 
-
 const uint16_t port = 1337;
 const int leds_count = 240;
-
-enum class preset_ops : uint8_t
-{
-  NOOP              = 0,
-  SETPIXEL          = 1,
-  FADEOUT           = 2,
-  FADEIN            = 3,
-  BRIGHT            = 4,
-  SETPIXEL_NOSHOW   = 5,
-  SHOW              = 6
-};
-
-struct __attribute__((packed)) led_packet
-{
-   preset_ops special_ops = preset_ops::SETPIXEL;
-   uint16_t pos;
-   uint8_t r;
-   uint8_t g;
-   uint8_t b;
-
-};
-
 
 int main()
 {
@@ -75,10 +54,10 @@ int main()
 	const uint8_t b2 = rand() % 255;
 	*/
 
-	const led_packet bright
+	const Remote::led_packet bright
 	{
 		.pos = 100,
-		.special_ops = preset_ops::BRIGHT,
+		.special_ops = Remote::preset_ops::BRIGHT,
 	};
 	sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 
@@ -100,7 +79,7 @@ int main()
 
 		for (uint16_t x = 0; x < 20; ++x)
 		{	
-			const vector<led_packet> leds { led_packet {
+			const vector<Remote::led_packet> leds { Remote::led_packet {
 				.pos = static_cast<uint16_t>(p + x),
 				.r = rs,
 				.g = gs,
@@ -110,7 +89,7 @@ int main()
 
 
 
-			sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+			sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(Remote::led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 			std::this_thread::sleep_for(50ms);
 
 
@@ -122,26 +101,26 @@ int main()
 		continue;
  
 
-		vector<led_packet> leds;
-		leds.emplace_back(led_packet
+		vector<Remote::led_packet> leds;
+		leds.emplace_back(Remote::led_packet
 		{
 			.pos = p,
 			.r = 96,
 			.g = 29,
 			.b = 100,
-			//.special_ops = preset_ops::FADEOUT,
+			//.special_ops = Remote::preset_ops::FADEOUT,
 		});
-		leds.emplace_back(led_packet
+		leds.emplace_back(Remote::led_packet
 		{
 			.pos = i,
 			.r = 255,
 			.g = 165,
 			.b = 0,
-			//.special_ops = preset_ops::FADEOUT,
+			//.special_ops = Remote::preset_ops::FADEOUT,
 		});
 
 
-		sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+		sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(Remote::led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 		std::this_thread::sleep_for(50ms);
 
 		continue;
@@ -150,7 +129,7 @@ int main()
 		/*const led_packet bright
 		{
 			.pos = b,
-			.special_ops = preset_ops::BRIGHT,
+			.special_ops = Remote::preset_ops::BRIGHT,
 		};
 		sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr)); */
 
@@ -160,34 +139,34 @@ int main()
 	do {
 		for (uint16_t p = 40; p < 240; ++p) {
 
-			const led_packet bright
+			const Remote::led_packet bright
 			{
 				.pos = p,
-				.special_ops = preset_ops::BRIGHT,
+				.special_ops = Remote::preset_ops::BRIGHT,
 			};
 			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 			std::this_thread::sleep_for(50ms);
-			const led_packet x 
+			const Remote::led_packet x 
 			{
 				.pos = p,
-				.special_ops = preset_ops::SHOW,
+				.special_ops = Remote::preset_ops::SHOW,
 			};
 			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 		}
 
 		for (uint16_t p = 240; p > 40; --p) {
 
-			const led_packet bright
+			const Remote::led_packet bright
 			{
 				.pos = p,
-				.special_ops = preset_ops::BRIGHT,
+				.special_ops = Remote::preset_ops::BRIGHT,
 			};
 			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 			std::this_thread::sleep_for(50ms);
-			const led_packet x 
+			const Remote::led_packet x 
 			{
 				.pos = p,
-				.special_ops = preset_ops::SHOW,
+				.special_ops = Remote::preset_ops::SHOW,
 			};
 			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 		}
@@ -204,7 +183,7 @@ int main()
 		const uint8_t g3 = rand() % 254;
 		const uint8_t b3 = rand() % 254;
 
-		led_packet led  {
+		Remote::led_packet led  {
 			.pos = rpos,
 			.r = r3,
 			.g = g3,

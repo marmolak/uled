@@ -5,125 +5,28 @@
 #include <EtherCard.h>
 #include <IPAddress.h>
 
+#include "Shared/Resources.hpp"
+#include "RemoteHandler/RemoteHandler.hpp"
+#include "RemoteProtocol/RemoteProtocol.hpp"
 #include "Presets/cyberpunk.hpp"
 
 // nice hack bro!
 void (*reset_me)(void) = 0;
 
-const static byte idle_period_secs = 30;
+const static unsigned int idle_period_secs = 30 * 1000;
 
 // ethernet
 const static byte my_ip[] = { 192, 168, 32, 230 };
 const static byte my_mac[] = { 0x71, 0x69, 0x69, 0x2D, 0x30, 0x31 };
 
-
-enum class preset_ops : uint8_t
-{
-    NOOP      = 0,
-    SETPIXEL  = 1,
-    FADEOUT   = 2,
-    FADEIN    = 3,
-    BRIGHT    = 4,
-    SETSLEN   = 5,
-};
-
-struct __attribute__((packed)) led_packet
-{
-  preset_ops special_ops;
-  int16_t pos;
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-};
-
-byte Ethernet::buffer[sizeof(led_packet) * 20];
+byte Ethernet::buffer[sizeof(Remote::led_packet) * 20];
 
 // stripe
 #define LED_PIN     5
 
-
-const uint16_t NUM_LEDS = 244;
-
 #define BRIGHTNESS  64
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-CRGB leds[NUM_LEDS];
-
-
-
-
-void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char *data, uint16_t len)
-{
-  if (len < sizeof(led_packet))
-  {
-    return;
-  }
-
-  char *point_data = data;
-
-  //Serial.println("Something: " + String(len % sizeof(led_packet)));
-
-  const uint16_t count = len / sizeof(led_packet);
-
-
-  for (uint16_t p = 0; p < count; ++p)
-  {
-    auto led_data = reinterpret_cast<led_packet *const>(point_data);
-
-    if (led_data->pos >= NUM_LEDS) {
-      led_data->pos %= NUM_LEDS;
-    }
-
-    switch (led_data->special_ops)
-    {
-      case preset_ops::SETPIXEL:
-      {
-        const auto pixel = CRGB(led_data->r, led_data->g, led_data->b);
-        leds[led_data->pos] = pixel;
-
-        FastLED.show();
-        break;
-      }
-
-      case preset_ops::FADEOUT:
-      {
-        const auto pixel = CRGB(led_data->r, led_data->g, led_data->b);
-
-        for (int16_t pos = 0; pos < led_data->pos; ++pos)
-        {
-          leds[pos] = pixel;
-        }
-        FastLED.show();
-
-        delay(50);
-
-        for (int16_t pos = 0; pos < led_data->pos; ++pos)
-        {
-          leds[pos] = CRGB::Black;
-        }
-        FastLED.show();
-
-        break;
-      }
- 
-      case preset_ops::BRIGHT:
-      {
-        if (led_data->pos >= 255) {
-          led_data->pos %= 255;
-        }
-
-        FastLED.setBrightness(led_data->pos);
-        break;
-      }
-    } // end switch
-    
-    point_data += sizeof(led_packet);
-
-    //Serial.println(String(led_data->pos) + ":" + String(led_data->r) + ":" + String(led_data->g) + ":" + String(led_data->b));
-  }
-
-  
-}
 
 void setup()
 {
@@ -141,12 +44,12 @@ void setup()
   }
 
   ether.staticSetup(my_ip, NULL);
-  ether.udpServerListenOnPort(&udp_parse, 1337);
+  ether.udpServerListenOnPort(&Remote::udp_parse, 1337);
 
   // stripe init
   delay(3000);
 
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(Shared::leds, Shared::NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 
   Serial.println(F("All DONE"));
@@ -176,5 +79,5 @@ void loop()
   // if we just
   preset = true;
 
-  Presets::CyberPunk::run(NUM_LEDS, leds);
+  Presets::CyberPunk::run(Shared::NUM_LEDS, Shared::leds);
 }

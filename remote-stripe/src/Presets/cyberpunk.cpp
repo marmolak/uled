@@ -29,9 +29,9 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
             delay(50);
         }
 
-        rs = (rs - ((rs - rf) / 20 * i));
-        gs = (gs - ((gs - gf) / 20 * i));
-        bs = (bs - ((bs - bf) / 20 * i));
+        rs = (rs - ((rs - rf) / step * i));
+        gs = (gs - ((gs - gf) / step * i));
+        bs = (bs - ((bs - bf) / step * i));
     }
 
     // stuck forever
@@ -40,15 +40,21 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
         for (uint16_t p = 40; p < 240; ++p) {
             FastLED.setBrightness(p);
             delay(50);
+            FastLED.show();
+            delay(50);
         }
 
-        delay(100);
+        delay(1000);
 
         // fade
         for (uint16_t p = 240; p > 40; --p) {
             FastLED.setBrightness(p);
             delay(50);
+            FastLED.show();
+            delay(50);
         }
+
+        delay(1000);
     } while (true);
 }
 
