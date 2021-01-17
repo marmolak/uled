@@ -1,10 +1,16 @@
+#include <Arduino.h>
+
 #include <FastLED.h>
 #include <SPI.h>
 #include <EtherCard.h>
 #include <IPAddress.h>
 
+#include "Presets/cyberpunk.hpp"
+
 // nice hack bro!
 void (*reset_me)(void) = 0;
+
+const static byte idle_period_secs = 30;
 
 // ethernet
 const static byte my_ip[] = { 192, 168, 32, 230 };
@@ -13,11 +19,12 @@ const static byte my_mac[] = { 0x71, 0x69, 0x69, 0x2D, 0x30, 0x31 };
 
 enum class preset_ops : uint8_t
 {
-  NOOP      = 0,
-  SETPIXEL  = 1,
-  FADEOUT   = 2,
-  FADEIN    = 3,
-  BRIGHT    = 4,
+    NOOP      = 0,
+    SETPIXEL  = 1,
+    FADEOUT   = 2,
+    FADEIN    = 3,
+    BRIGHT    = 4,
+    SETSLEN   = 5,
 };
 
 struct __attribute__((packed)) led_packet
@@ -124,7 +131,7 @@ void setup()
 
   // Init ethernet
   int ret = ether.begin(sizeof Ethernet::buffer, my_mac, SS);
-  //int ret = 0;
+
   if (ret == 0)
   {
     Serial.println(F("Failed to access Ethernet controller"));
@@ -139,15 +146,35 @@ void setup()
   // stripe init
   delay(3000);
 
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 
   Serial.println(F("All DONE"));
   Serial.flush();
 }
 
+static unsigned long idle_time;
+static bool preset = false;
+
 void loop()
 {
-  ether.packetLoop(ether.packetReceive());
+  if (!preset) {
+    const unsigned long start_time = millis();
 
+    ether.packetLoop(ether.packetReceive());
+
+    const unsigned long stop_time = millis();
+  
+    idle_time += (stop_time - start_time);
+  } 
+
+  if ((idle_time < idle_period_secs))
+  {
+    return;
+  }
+
+  // if we just
+  preset = true;
+
+  Presets::CyberPunk::run(NUM_LEDS, leds);
 }
