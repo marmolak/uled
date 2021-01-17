@@ -23,17 +23,19 @@ const int leds_count = 240;
 
 enum class preset_ops : uint8_t
 {
-  NOOP      = 0,
-  SETPIXEL  = 1,
-  FADEOUT   = 2,
-  FADEIN    = 3,
-  BRIGHT    = 4,
+  NOOP              = 0,
+  SETPIXEL          = 1,
+  FADEOUT           = 2,
+  FADEIN            = 3,
+  BRIGHT            = 4,
+  SETPIXEL_NOSHOW   = 5,
+  SHOW              = 6
 };
 
 struct __attribute__((packed)) led_packet
 {
    preset_ops special_ops = preset_ops::SETPIXEL;
-   int16_t pos;
+   uint16_t pos;
    uint8_t r;
    uint8_t g;
    uint8_t b;
@@ -62,6 +64,8 @@ int main()
 
 	std::srand(std::time(nullptr));
 
+
+	/*
 	const uint8_t r1 = rand() % 100;
 	const uint8_t g1 = rand() % 40;
 	const uint8_t b1 = rand() % 255;
@@ -69,22 +73,54 @@ int main()
 	const uint8_t r2 = rand() % 100;
 	const uint8_t g2 = rand() % 40;
 	const uint8_t b2 = rand() % 255;
+	*/
 
 	const led_packet bright
 	{
-		.pos = 200,
+		.pos = 100,
 		.special_ops = preset_ops::BRIGHT,
 	};
 	sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 
+	uint8_t rs = 96;
+	uint8_t gs = 29;
+	uint8_t bs = 100;
 
-	for (int16_t p = 0,
-	     i = leds_count - 1,
-	     b = 10;
+	const uint8_t rf = 255;
+	const uint8_t gf = 165;
+	const uint8_t bf = 0;
+
+	for (uint16_t p = 0,
+	     i = 0 
+	     ;
 	     p < leds_count;
-	     ++p, --i, ++b
+	     p+=20, ++i
 	)
 	{
+
+		for (uint16_t x = 0; x < 20; ++x)
+		{	
+			const vector<led_packet> leds { led_packet {
+				.pos = static_cast<uint16_t>(p + x),
+				.r = rs,
+				.g = gs,
+				.b = bs,
+				//.special_ops = preset_ops::FADEOUT,
+			}};
+
+
+
+			sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+			std::this_thread::sleep_for(50ms);
+
+
+		}
+		rs = (rs - ((rs - rf) / 20 * i));
+		gs = (gs - ((gs - gf) / 20 * i));
+		bs = (bs - ((bs - bf) / 20 * i));
+
+		continue;
+ 
 
 		vector<led_packet> leds;
 		leds.emplace_back(led_packet
@@ -108,17 +144,55 @@ int main()
 		sendto(sockfd, (void *) leds.data(), leds.size() * sizeof(led_packet), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 		std::this_thread::sleep_for(50ms);
 
-
-
 		continue;
-		const led_packet bright
+
+
+		/*const led_packet bright
 		{
 			.pos = b,
 			.special_ops = preset_ops::BRIGHT,
 		};
-		sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+		sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr)); */
 
 	}
+
+
+	do {
+		for (uint16_t p = 40; p < 240; ++p) {
+
+			const led_packet bright
+			{
+				.pos = p,
+				.special_ops = preset_ops::BRIGHT,
+			};
+			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+			std::this_thread::sleep_for(50ms);
+			const led_packet x 
+			{
+				.pos = p,
+				.special_ops = preset_ops::SHOW,
+			};
+			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+		}
+
+		for (uint16_t p = 240; p > 40; --p) {
+
+			const led_packet bright
+			{
+				.pos = p,
+				.special_ops = preset_ops::BRIGHT,
+			};
+			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+			std::this_thread::sleep_for(50ms);
+			const led_packet x 
+			{
+				.pos = p,
+				.special_ops = preset_ops::SHOW,
+			};
+			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+		}
+			std::this_thread::sleep_for(50ms);
+	} while (true);
 
 	return EXIT_SUCCESS; 
 	std::this_thread::sleep_for(1s);
