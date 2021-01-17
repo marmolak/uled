@@ -12,7 +12,8 @@ enum class preset_ops : uint8_t
     FADEIN            = 3,
     BRIGHT            = 4,
     SETPIXEL_NOSHOW   = 5,
-    SHOW              = 6
+    SHOW              = 6,
+    PRESET            = 7,
 };
 
 struct __attribute__((packed)) led_packet

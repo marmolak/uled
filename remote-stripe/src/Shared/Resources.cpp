@@ -1,8 +1,8 @@
 #include "Shared/Resources.hpp"
+#include "Common/Config/Config.hpp"
 
 namespace Shared {
 
-const uint16_t NUM_LEDS = 244;
-CRGB leds[NUM_LEDS];
+CRGB leds[Config::NUM_LEDS];
 
 }

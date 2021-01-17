@@ -5,10 +5,11 @@
 #include <EtherCard.h>
 #include <IPAddress.h>
 
+#include "Common/Config/Config.hpp"
 #include "Shared/Resources.hpp"
 #include "RemoteHandler/RemoteHandler.hpp"
 #include "RemoteProtocol/RemoteProtocol.hpp"
-#include "Presets/cyberpunk.hpp"
+
 
 // nice hack bro!
 void (*reset_me)(void) = 0;
@@ -33,8 +34,7 @@ void setup()
   Serial.begin(9600);
 
   // Init ethernet
-  int ret = ether.begin(sizeof Ethernet::buffer, my_mac, SS);
-
+  const int ret = ether.begin(sizeof Ethernet::buffer, my_mac, SS);
   if (ret == 0)
   {
     Serial.println(F("Failed to access Ethernet controller"));
@@ -44,40 +44,19 @@ void setup()
   }
 
   ether.staticSetup(my_ip, NULL);
-  ether.udpServerListenOnPort(&Remote::udp_parse, 1337);
+  ether.udpServerListenOnPort(&Remote::udp_parse, Config::port);
 
   // stripe init
   delay(3000);
 
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(Shared::leds, Shared::NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(Shared::leds, Config::NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 
   Serial.println(F("All DONE"));
   Serial.flush();
 }
 
-static unsigned long idle_time;
-static bool preset = false;
-
 void loop()
 {
-  if (!preset) {
-    const unsigned long start_time = millis();
-
-    ether.packetLoop(ether.packetReceive());
-
-    const unsigned long stop_time = millis();
-  
-    idle_time += (stop_time - start_time);
-  } 
-
-  if ((idle_time < idle_period_secs))
-  {
-    return;
-  }
-
-  // if we just
-  preset = true;
-
-  Presets::CyberPunk::run(Shared::NUM_LEDS, Shared::leds);
+  ether.packetLoop(ether.packetReceive());
 }

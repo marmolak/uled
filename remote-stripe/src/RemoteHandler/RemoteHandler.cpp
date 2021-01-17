@@ -1,8 +1,13 @@
 #include <FastLED.h>
 
+#include "Common/Config/Config.hpp"
+
 #include "RemoteProtocol/RemoteProtocol.hpp"
 #include "RemoteHandler/RemoteHandler.hpp"
 #include "Shared/Resources.hpp"
+
+// add presets
+#include "Presets/cyberpunk.hpp"
 
 namespace Remote {
 
@@ -13,9 +18,8 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
       return;
   }
 
+  // Yeah.. i'm pig. Just blame me. 
   char *point_data = data;
-
-  //Serial.println("Something: " + String(len % sizeof(led_packet)));
 
   const uint16_t count = len / sizeof(led_packet);
 
@@ -23,9 +27,9 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
   {
     auto led_data = reinterpret_cast<led_packet *const>(point_data);
 
-    if (led_data->pos >= Shared::NUM_LEDS)
+    if (led_data->pos >= Config::NUM_LEDS)
     {
-        led_data->pos %= Shared::NUM_LEDS;
+        led_data->pos %= Config::NUM_LEDS;
     }
 
     switch (led_data->special_ops)
@@ -82,11 +86,15 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
         FastLED.show();
         break;
       }
+
+      case preset_ops::PRESET:
+      {
+          // we should support more presets but it doesn't matter now.
+          Presets::CyberPunk::run(Config::NUM_LEDS, Shared::leds);
+      }
     } // end switch
     
     point_data += sizeof(led_packet);
-
-    //Serial.println(String(led_data->pos) + ":" + String(led_data->r) + ":" + String(led_data->g) + ":" + String(led_data->b));
   }
 }
 
