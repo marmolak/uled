@@ -19,6 +19,15 @@
 using namespace std::chrono_literals;
 using namespace std;
 
+void preset(const int sockfd)
+{
+	const Remote::led_packet preset
+	{
+		.special_ops = Remote::preset_ops::PRESET,
+	};
+	sendto(sockfd, (void *) &preset, sizeof(preset), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+}
+
 int main(int argc, char **argv)
 {
 	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -33,6 +42,17 @@ int main(int argc, char **argv)
 		.sin_addr 	= *((struct in_addr *)host->h_addr)
 	};
 	memset(&(servaddr.sin_zero), 0, sizeof(servaddr.sin_zero));
+
+	if (argc >= 1)
+	{
+		const bool ok = (strcmp(argv[1], "--preset") == 0);
+		if (!ok) {
+			return EXIT_FAILURE;
+		}
+
+		preset(socketfd);
+		return EXIT_SUCCESS;
+	}
 
 	const Remote::led_packet bright
 	{
