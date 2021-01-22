@@ -17,8 +17,11 @@ void (*reset_me)(void) = 0;
 const static unsigned int idle_period_secs = 30 * 1000;
 
 // ethernet
-const static byte my_ip[] = { 192, 168, 32, 230 };
-const static byte my_mac[] = { 0x71, 0x69, 0x69, 0x2D, 0x30, 0x31 };
+const static byte my_ip[]   = { 192, 168, 32, 230 };
+const static byte my_gw[]   = { 192, 168, 32, 1 };
+const static byte my_dns[]  = { 192, 168, 32, 31 };
+const static byte my_mask[] = { 255, 255, 255, 0 };
+const static byte my_mac[]  = { 0x71, 0x69, 0x69, 0x3D, 0x31, 0x31 };
 
 byte Ethernet::buffer[sizeof(Remote::led_packet) * 20];
 
@@ -43,7 +46,7 @@ void setup()
     reset_me();
   }
 
-  ether.staticSetup(my_ip, NULL);
+  ether.staticSetup(my_ip, my_gw, my_dns, my_mac);
   ether.udpServerListenOnPort(&Remote::udp_parse, Config::port);
 
   // stripe init
