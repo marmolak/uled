@@ -1,8 +1,13 @@
+#include <avr/power.h>
+
 #include "Presets/cyberpunk.hpp"
 #include "Common/Config/Config.hpp"
 
 namespace Presets {
 
+/** @brief CyberPunk (purple/orange) like preset 
+ * 
+ */
 void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
 {
     FastLED.setBrightness(100);
@@ -19,6 +24,15 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
 
     const uint16_t step = 20;
 
+    // power save mode
+
+    // 1 MHz
+    clock_prescale_set(clock_div_8);
+
+    power_adc_disable();
+    power_twi_disable();
+    
+
     for (uint16_t p = 0, i = 0; p < leds_count; p += step, ++i)
     {
         for (uint16_t x = 0; x < step; ++x)
@@ -27,7 +41,7 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
             leds[p + x] = pixel;
 
             FastLED.show();
-            delay(50);
+            delay(50 / 8);
         }
 
         rs = (rs - ((rs - rf) / step * i));
@@ -40,22 +54,22 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
         // light up
         for (uint16_t p = 40; p < 240; ++p) {
             FastLED.setBrightness(p);
-            delay(50);
+            delay(50 / 8);
             FastLED.show();
-            delay(50);
+            delay(50 / 8);
         }
 
-        delay(1000);
+        delay(1000 / 8);
 
         // fade
         for (uint16_t p = 240; p > 40; --p) {
             FastLED.setBrightness(p);
-            delay(50);
+            delay(50 / 8);
             FastLED.show();
-            delay(50);
+            delay(50 / 8);
         }
 
-        delay(1000);
+        delay(1000 / 8);
     } while (true);
 }
 
