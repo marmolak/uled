@@ -26,8 +26,8 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
 
     // power save mode
 
-    // 1 MHz
-    clock_prescale_set(clock_div_8);
+    // Doesn't work for now
+    // clock_prescale_set(clock_div_1);
 
     power_adc_disable();
     power_twi_disable();
@@ -41,7 +41,7 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
             leds[p + x] = pixel;
 
             FastLED.show();
-            delay(50 / 8);
+            delay(50);
         }
 
         rs = (rs - ((rs - rf) / step * i));
@@ -54,9 +54,9 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
         // light up
         for (uint16_t p = 40; p < 240; ++p) {
             FastLED.setBrightness(p);
-            delay(50 / 8);
+            delay(50);
             FastLED.show();
-            delay(50 / 8);
+            delay(50);
         }
 
         delay(1000 / 8);
@@ -64,12 +64,12 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
         // fade
         for (uint16_t p = 240; p > 40; --p) {
             FastLED.setBrightness(p);
-            delay(50 / 8);
+            delay(50);
             FastLED.show();
-            delay(50 / 8);
+            delay(50);
         }
 
-        delay(1000 / 8);
+        delay(1000);
     } while (true);
 }
 
