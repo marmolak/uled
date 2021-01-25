@@ -19,13 +19,13 @@
 using namespace std::chrono_literals;
 using namespace std;
 
-void preset(const int sockfd)
+void preset(const int sockfd, struct sockaddr_in *servaddr)
 {
 	const Remote::led_packet preset
 	{
 		.special_ops = Remote::preset_ops::PRESET,
 	};
-	sendto(sockfd, (void *) &preset, sizeof(preset), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+	sendto(sockfd, (void *) &preset, sizeof(preset), 0, (struct sockaddr *) servaddr, sizeof(struct sockaddr));
 }
 
 int main(int argc, char **argv)
@@ -43,14 +43,14 @@ int main(int argc, char **argv)
 	};
 	memset(&(servaddr.sin_zero), 0, sizeof(servaddr.sin_zero));
 
-	if (argc >= 1)
+	if (argc >= 2)
 	{
 		const bool ok = (strcmp(argv[1], "--preset") == 0);
 		if (!ok) {
 			return EXIT_FAILURE;
 		}
 
-		preset(socketfd);
+		preset(sockfd, &servaddr);
 		return EXIT_SUCCESS;
 	}
 
