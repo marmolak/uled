@@ -108,15 +108,19 @@ int main(int argc, char **argv)
 			};
 			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 			std::this_thread::sleep_for(50ms);
+
 			const Remote::led_packet x 
 			{
 				.pos = p,
 				.special_ops = Remote::preset_ops::SHOW,
 			};
 			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
+			std::this_thread::sleep_for(50ms);
 		}
 
-		for (uint16_t p = 240; p > 40; --p) {
+		std::this_thread::sleep_for(1s);
+
+		for (uint16_t p = 239; p > 40; --p) {
 
 			const Remote::led_packet bright
 			{
@@ -125,14 +129,16 @@ int main(int argc, char **argv)
 			};
 			sendto(sockfd, (void *) &bright, sizeof(bright), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
 			std::this_thread::sleep_for(50ms);
+
 			const Remote::led_packet x 
 			{
 				.pos = p,
 				.special_ops = Remote::preset_ops::SHOW,
 			};
 			sendto(sockfd, (void *) &x, sizeof(x), 0, (struct sockaddr *) &servaddr, sizeof(struct sockaddr));
-		}
 			std::this_thread::sleep_for(50ms);
+		}
+		std::this_thread::sleep_for(1s);
 	} while (true);
 
 	return EXIT_SUCCESS; 
