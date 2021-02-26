@@ -11,19 +11,6 @@
 #include "RemoteProtocol/RemoteProtocol.hpp"
 
 
-// nice hack bro!
-void (*reset_me)(void) = 0;
-
-const static unsigned int idle_period_secs = 30 * 1000;
-
-// ethernet
-const static byte my_ip[]   = { 192, 168, 32, 230 };
-const static byte my_gw[]   = { 192, 168, 32, 1 };
-const static byte my_dns[]  = { 192, 168, 32, 31 };
-const static byte my_mask[] = { 255, 255, 255, 0 };
-const static byte my_mac[]  = { 0x71, 0x69, 0x69, 0x3D, 0x31, 0x31 };
-
-byte Ethernet::buffer[sizeof(Remote::led_packet) * 20];
 
 // stripe
 #define LED_PIN     5
@@ -32,21 +19,31 @@ byte Ethernet::buffer[sizeof(Remote::led_packet) * 20];
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
+static byte Ethernet::buffer[sizeof(Remote::led_packet) * 20u];
+
+namespace { 
+  // nice hack bro!
+  void (*reset_me)(void) = 0;
+
+  const unsigned int idle_period_secs = 30 * 1000;
+
+} // end of namespace
+
 void setup()
 {
   Serial.begin(9600);
 
   // Init ethernet
-  const int ret = ether.begin(sizeof Ethernet::buffer, my_mac, SS);
+  const int ret = ether.begin(sizeof Ethernet::buffer, Common::Config::Network::my_mac, SS);
   if (ret == 0)
   {
-    Serial.println(F("Failed to access Ethernet controller"));
-    Serial.flush();
-    delay(1000);
-    reset_me();
+      Serial.println(F("Failed to access Ethernet controller"));
+      Serial.flush();
+      delay(1000);
+      reset_me();
   }
 
-  ether.staticSetup(my_ip, my_gw, my_dns, my_mac);
+  ether.staticSetup(Common::Config::Network::my_ip, Common::Config::Network::my_gw, Common::Config::Network::my_dns, Common::Config::Network::my_mac);
   ether.udpServerListenOnPort(&Remote::udp_parse, Config::port);
 
   // stripe init
@@ -61,5 +58,5 @@ void setup()
 
 void loop()
 {
-  ether.packetLoop(ether.packetReceive());
+    ether.packetLoop(ether.packetReceive());
 }
