@@ -19,10 +19,10 @@ enum class preset_ops : uint8_t
 struct __attribute__((packed)) led_packet
 {
     preset_ops special_ops;
-    uint16_t pos;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
+    uint16_t pos { 0 };
+    uint8_t r { 0 };
+    uint8_t g { 0 };
+    uint8_t b { 0 };
 };
 
 };
