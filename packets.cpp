@@ -40,9 +40,9 @@ int main(int argc, char **argv)
 	{
 		.sin_family = AF_INET,
 		.sin_port 	= htons(Config::port),
-		.sin_addr 	= *((struct in_addr *)host->h_addr)
+		.sin_addr 	= *((struct in_addr *)host->h_addr),
+		.sin_zero   = { 0 }
 	};
-	memset(&(servaddr.sin_zero), 0, sizeof(servaddr.sin_zero));
 
 	if (argc >= 2)
 	{
