@@ -6,6 +6,7 @@
 #include <IPAddress.h>
 
 #include "Common/Config/Config.hpp"
+#include "Common/Config/Network.hpp"
 #include "Shared/Resources.hpp"
 #include "RemoteHandler/RemoteHandler.hpp"
 #include "RemoteProtocol/RemoteProtocol.hpp"
