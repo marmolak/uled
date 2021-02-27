@@ -59,10 +59,10 @@ void CyberPunk::run(const uint16_t leds_count, CRGB leds[])
             delay(50);
         }
 
-        delay(1000 / 8);
+        delay(1000);
 
         // fade
-        for (uint16_t p = 240; p > 40; --p) {
+        for (uint16_t p = 239; p > 40; --p) {
             FastLED.setBrightness(p);
             delay(50);
             FastLED.show();
