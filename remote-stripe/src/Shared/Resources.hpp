@@ -4,7 +4,6 @@
 
 namespace Shared {
 
-extern const uint16_t NUM_LEDS;
 extern CRGB leds[];
 
 }

@@ -11,6 +11,7 @@
 #include "RemoteHandler/RemoteHandler.hpp"
 #include "RemoteProtocol/RemoteProtocol.hpp"
 
+#include "Presets/cyberpunk.hpp"
 
 
 // stripe
@@ -20,7 +21,7 @@
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
-static byte Ethernet::buffer[sizeof(Remote::led_packet) * 20u];
+byte Ethernet::buffer[sizeof(Remote::led_packet) * 20u];
 
 namespace { 
   // nice hack bro!
@@ -60,4 +61,6 @@ void setup()
 void loop()
 {
     ether.packetLoop(ether.packetReceive());
+
+    Presets::cp.run(Config::NUM_LEDS, Shared::leds);
 }

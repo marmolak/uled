@@ -90,7 +90,7 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
       case preset_ops::PRESET:
       {
           // we should support more presets but it doesn't matter now.
-          Presets::CyberPunk::run(Config::NUM_LEDS, Shared::leds);
+          Presets::cp.start();
           break;
       }
     } // end switch
@@ -100,4 +100,4 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
 }
 
 
-}
+} // end of namespace
