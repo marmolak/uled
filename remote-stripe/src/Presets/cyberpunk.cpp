@@ -61,6 +61,12 @@ void CyberPunk::start()
     internal_state.current = internal_state::cyber_state::INIT_LEDS_1;
 }
 
+void CyberPunk::stop()
+{
+    reset_internal_state();
+    internal_state.current = internal_state::cyber_state::NOTHING;
+}
+
 /* private */
 void CyberPunk::reset_internal_state()
 {

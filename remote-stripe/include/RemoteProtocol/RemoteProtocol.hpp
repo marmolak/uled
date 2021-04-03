@@ -6,14 +6,15 @@ namespace Remote {
 
 enum class preset_ops : uint8_t
 {
-    NOOP              = 0,
-    SETPIXEL          = 1,
-    FADEOUT           = 2,
-    FADEIN            = 3,
-    BRIGHT            = 4,
-    SETPIXEL_NOSHOW   = 5,
-    SHOW              = 6,
-    PRESET            = 7,
+    NOOP              = 0u,
+    SETPIXEL          = 1u,
+    FADEOUT           = 2u,
+    FADEIN            = 3u,
+    BRIGHT            = 4u,
+    SETPIXEL_NOSHOW   = 5u,
+    SHOW              = 6u,
+    PRESET            = 7u,
+    PRESET_STOP       = 8u,
 };
 
 struct __attribute__((packed)) led_packet

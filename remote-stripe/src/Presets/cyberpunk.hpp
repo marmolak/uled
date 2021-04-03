@@ -10,6 +10,8 @@ class CyberPunk
 {
     public:
         void start();
+        void stop();
+
         void run(const uint16_t leds_count, CRGB leds[]);
 
     private:

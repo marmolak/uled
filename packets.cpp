@@ -19,7 +19,7 @@
 using namespace std::chrono_literals;
 using namespace std;
 
-void preset(const int sockfd, struct sockaddr_in *servaddr)
+void preset_start(const int sockfd, struct sockaddr_in *servaddr)
 {
 	const Remote::led_packet preset
 	{
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		preset(sockfd, &servaddr);
+		preset_start(sockfd, &servaddr);
 		return EXIT_SUCCESS;
 	}
 

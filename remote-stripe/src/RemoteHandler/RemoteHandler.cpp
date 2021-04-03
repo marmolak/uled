@@ -93,6 +93,13 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
           Presets::cp.start();
           break;
       }
+
+      case preset_ops::PRESET_STOP:
+      {
+          // we should support more presets but it doesn't matter now.
+          Presets::cp.stop();
+          break;
+      }
     } // end switch
     
     point_data += sizeof(led_packet);
