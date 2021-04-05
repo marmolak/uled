@@ -643,6 +643,7 @@ void EtherCard::httpPost (const char *urlbuf, const char *hoststr, const char *a
 }
 
 static uint16_t tcp_datafill_cb(uint8_t fd) {
+    (void) fd;
     uint16_t len = Stash::length();
     Stash::extract(0, len, EtherCard::tcpOffset());
     Stash::cleanup();
@@ -771,7 +772,6 @@ void EtherCard::packetLoopIdle()
 }
 
 uint16_t EtherCard::packetLoop (uint16_t plen) {
-    uint16_t len;
 
 #if ETHERCARD_DHCP
     if(using_dhcp) {
@@ -831,6 +831,8 @@ uint16_t EtherCard::packetLoop (uint16_t plen) {
         return 0; //from here on we are only interested in TCP-packets; these are longer than 54 bytes
 
 #if ETHERCARD_TCPCLIENT
+    uint16_t len;
+
     if (gPB[TCP_DST_PORT_H_P]==TCPCLIENT_SRC_PORT_H)
     {   //Source port is in range reserved (by EtherCard) for client TCP/IP connections
         if (check_ip_message_is_from(hisip)==0)
@@ -909,6 +911,8 @@ uint16_t EtherCard::packetLoop (uint16_t plen) {
     //If we are here then this is a TCP/IP packet targeted at us and not related to our client connection so accept
     return accept(hisport, plen);
 #endif
+
+    return 0;
 }
 
 void EtherCard::persistTcpConnection(bool persist) {
