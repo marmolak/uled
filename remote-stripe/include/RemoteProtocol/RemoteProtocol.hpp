@@ -1,6 +1,5 @@
 #pragma once
-
-#include "Common/MultiarchIncludes.hpp"
+#include <stdint.h>
 
 namespace Remote {
 

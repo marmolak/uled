@@ -13,7 +13,6 @@
 
 #include "Presets/cyberpunk.hpp"
 
-
 // stripe
 #define LED_PIN     5
 
