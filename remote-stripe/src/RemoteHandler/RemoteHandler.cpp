@@ -47,7 +47,7 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
       {
         const auto pixel = CRGB(led_data->r, led_data->g, led_data->b);
 
-        for (int16_t pos = 0; pos < led_data->pos; ++pos)
+        for (uint16_t pos = 0; pos < led_data->pos; ++pos)
         {
             Shared::leds[pos] = pixel;
         }
@@ -55,7 +55,7 @@ void udp_parse(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const c
 
         delay(50);
 
-        for (int16_t pos = 0; pos < led_data->pos; ++pos)
+        for (uint16_t pos = 0; pos < led_data->pos; ++pos)
         {
             Shared::leds[pos] = CRGB::Black;
         }
