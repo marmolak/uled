@@ -20,7 +20,7 @@
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
-byte Ethernet::buffer[sizeof(Remote::led_packet) * 20u];
+uint8_t Ethernet::buffer[sizeof(Remote::led_packet) * 20u];
 
 namespace { 
   // nice hack bro!
